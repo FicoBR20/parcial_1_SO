@@ -32,14 +32,16 @@ string listaDatos="mlq001-a.txt";
  */
 struct job_ready
 {
+    int aa_serie;                         //particularizacion del objeto.
     string a_etiq;                        //representa la etiqueta de la tarea
-    int b_burst;                          //representa el Burst time de la tarea
-    int c_arrvt;                          //representa el arrival time de la tarea
-    int d_quev;                           //representa una determinada cola de procesos de tareas
-    int e_prior;                          //representa el indice de la prioridad de ejecucion de una tarea con relacion a las demas tareas
+   
+    string b_burst;                          //representa el Burst time de la tarea
+    string c_arrvt;                          //representa el arrival time de la tarea
+    string d_quev;                           //representa una determinada cola de procesos de tareas
+    string e_prior;                          //representa el indice de la prioridad de ejecucion de una tarea con relacion a las demas tareas
 
-    
-    void set_registro(string et, int bt, int at, int qv, int prio){
+    void set_registro(int ser, string et, string bt, string at, string qv, string prio){
+        aa_serie=ser;
         a_etiq = et;
         b_burst = bt;
         c_arrvt = at;
@@ -64,15 +66,10 @@ std::vector<string> string_To_array(std::string input)
 
     string receptor;
 
-    string terminacion ="\0";
-
-
     while (stringReader >> receptor)
     {
         str_arreglo.push_back(receptor);
     }
-
-    str_arreglo.push_back(terminacion);
 
     return str_arreglo;
 }
@@ -178,6 +175,56 @@ std::vector<string>lectura_archivo_txt(const string ubicacion_de_los_datos)
     }
 
     return lineas_recibidas;                                            
+}
+
+std::vector<job_ready>tarea_en_espera(std::vector<string>l_recibidas){
+
+    std::vector<string>unico;
+
+    std::vector<job_ready>jobs;
+
+    int serial = 100;
+
+    for(string rec : l_recibidas){
+
+        unico = string_To_array(rec);
+
+        for(job_ready jr: jobs){
+
+            jr.aa_serie=serial;
+
+            serial++;
+
+            for (int i = 0; i < unico.size(); i++)
+            {
+                jr.a_etiq = unico.at(0);
+
+                jr.b_burst = unico.at(1);
+
+                jr.c_arrvt = unico.at(2);
+
+                jr.d_quev = unico.at(3);
+
+                jr.e_prior=unico.at(4);
+                
+            }
+
+            jobs.push_back(jr);
+            
+
+
+        }
+
+    }
+
+    for(job_ready rr : jobs){
+
+        cout<<"soy el bt"<<rr.b_burst<<endl;
+    }
+
+
+
+
 }
 
 
