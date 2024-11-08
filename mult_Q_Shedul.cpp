@@ -2,7 +2,7 @@
  * Archivo: mutl_Q_She.cpp
  * Autor: federico.barbetti@correounivalle.edu.co
  * Fecha creacion: 2024-10-13
- * Fecha ultima modificacion: 2024-10-16
+ * Fecha ultima modificacion: 2024-11-08
  * Licencia: GNU-GPL
  */
 
@@ -18,18 +18,14 @@
 using namespace std;
 
 std::vector <string> sheduler;               //Variable GLOBAL, es un listado de registros.
-string* d_apuntador=&sheduler[0];       //representa la primera ubicacion en la lista de ejecucion de las tareas.
-stringstream sst;
-
-
-
 
 /**
  * @brief variable GLOBAL
  * Corresponde al archivo de texto con los datos correspodientes a las
  * tareas por ejecutarse.
  */
-string listaDatos="/home/fede/p_cpp_proyects/examen_parcial_1_SO/parcial_1_SO/mlq025.txt";
+string ubicaDatos="/home/fede/p_cpp_proyects/examen_parcial_1_SO/parcial_1_SO/mlq001.txt";
+
 
 //string datos_recibidos;
 
@@ -59,30 +55,10 @@ struct job_ready
     }                      
 };
 
-/**
- * @brief funcion que elimina simbolos no necesarios
- * para el proceso de los datos
- * @param input 
- * @return std::vector<string> 
- */
-std::vector<string> string_To_array(std::string input)
-{
-    std::replace(input.begin(), input.end(), ';', ' ');
+string importante="";
+string*imptr = &importante;
 
-    std::istringstream stringReader{ input };
-
-    std::vector<string> str_arreglo;
-
-    string receptor;
-
-    while (stringReader >> receptor)
-    {
-
-        str_arreglo.push_back(receptor);
-    }
-
-    return str_arreglo;
-}
+std::vector<string>recolector;
 
 
 /**
@@ -111,102 +87,86 @@ std::vector<job_ready>orden_por_prioridad(vector<job_ready>cola_registros){
 }
 
 
+
+
+
+
 /**
- * @brief funcion que lee los datos de un archivo de texto suministrado
- * y retorna un vector<string> con los datos leidos.
+ * @brief funcion que a partir de un archivo de texto formateado debidamente, 
+ * entrega un vector de tipo string con la informacion lista para ser procesada,
+ * estos datos se usaran para inicializar los objetos de tipo job_ready necesarios
+ * para ejecutar los procesos que la app abordara.
  * 
- * @param ubicacion_de_los_datos 
+ * @param listadoDatos 
+ * @return std::vector<string> 
  */
-std::vector<string>lectura_archivo_txt(const string ubicacion_de_los_datos)
-{
-    vector<string>bloqueDatos;
+std::vector<string> leerDatos(string listadoDatos){
 
-    vector<char*>nuevos_Datos;
+    ifstream mylector(listadoDatos);                      //objeto stream de lectura
 
+    char muestra_simbolo;                               //contenedor de cada simbolo leido
 
-    vector<char*>lineas_recibidas;
+    string st1, st2, st3, st4, st5;                     //contenedores de cadena formateada
 
-    string receptorDatos;                   //obj que recepcionara los datos filtrados
-    
-    string esperanza="";
+    string for_used_lines = "";                         //contenedor de linea leida
 
-    char receptor[] ="";
-    
-    char select_info; 
-    
-    char destino[200] ="";                     //auxiliar para validar renglon a leer
-    
-    char b_destino[20]="";
-
-    char sx_elemento[8];                       //cadena hasta el ";"
-
-    char osx_elemento[10];
-    
-    int zt_cuenta=0;                            //cuantnos simbolos fueron leidos la ultima vez
-    
-    std::ifstream lector(ubicacion_de_los_datos);       //obj stream que lee datos del archivo de texto
+    int curr_post = 0;                                  //contenedor de posicion de lectura
 
 
-    
-    if (lector.is_open())
+
+    if (mylector.is_open())
     {
         do
         {
-
-            //char detenedor=lector.get();
             
-           // select_info=lector.peek();
+            curr_post=mylector.tellg();
+            muestra_simbolo=mylector.get();
+            getline(mylector, for_used_lines, '\n');
 
-            getline(lector, receptorDatos, ';');
-
-            if (!lector.fail() )                 //aqui empieza realmente el buffer
+            if (!mylector.fail()) 
             {
 
+                if ( muestra_simbolo != '#' || muestra_simbolo=='\n')
+                {
+                    mylector.seekg(curr_post, ifstream::beg);
 
-                // if (select_info=='#' && !receptorDatos.empty())
-                // {
-                //     select_info=lector.peek();
-                //     cout<<receptorDatos<<endl;
+                    if(!for_used_lines.empty() && muestra_simbolo!='\0')
+                    {
+                        getline(mylector, st1,';');
+                        sheduler.push_back(st1);
+                        getline(mylector, st2,';');
+                        sheduler.push_back(st2);
+                        getline(mylector, st3,';');
+                        sheduler.push_back(st3);
+                        getline(mylector, st4,';');
+                        sheduler.push_back(st4);
+                        getline(mylector, st5,'\n');
+                        sheduler.push_back(st5);
+                    }
+                
                     
-                // }
-
-                cout<<receptorDatos<<endl;
-
-                bloqueDatos.push_back(receptorDatos);
-
-
-                
-
-
-                
+                }
+                    
             }
-            else{
-                cout<<".... latencia positiva...."<<endl;
-            }
-
             
-        } while (!lector.fail());
+        } while (!mylector.fail());
         
-        
     }
-    else{
+    mylector.close();
 
-        cout<<"no se pudo abrir el stream"<<endl;
+    cout<<"El size del vector es; "<<sheduler.size()<<endl;
+
+    for(string x : sheduler){
+        cout<<"El string es: "<<x<<" y el size del vector es; "
+        <<sheduler.size()<<endl;
     }
 
-    //veficaciones
-
-    for (int i = 0; i < bloqueDatos.size(); i++)
-    {
-        cout<<" Posicion [ "<<i<<" ] es "<<bloqueDatos.at(i)<<endl;
-    }
-    
-
-
-
-
-    return bloqueDatos;                                            
+    return sheduler;   
 }
+
+
+
+
 
 
 // job_ready config_job(string datos){
@@ -257,34 +217,19 @@ std::vector<string>lectura_archivo_txt(const string ubicacion_de_los_datos)
 int main(int argc, char const *argv[])
 {
     //prueba funcion de lectura de archivos
-
-    job_ready jr1;  
-    
-    char* infoLista; 
-    
-    int largo;                                                      //instania
-
-    string listaPrueba="/home/fede/p_cpp_proyects/examen_parcial_1_SO/parcial_1_SO/mlq025.txt";
     
     vector <string> el_probador;
 
     std::vector<job_ready>cola_trb;
 
-    el_probador=lectura_archivo_txt(listaPrueba);  //vector con punteros char* 
+    el_probador = leerDatos(ubicaDatos);  //vector con datos limpios para procesar
 
-    cout<<"size de el vector de salida "<<el_probador.size()<<endl;
+    //prueba de lectura ...aprobada....Nov-8-24
 
-    // infoLista = el_probador.at(1);
-
-    // largo = sizeof(infoLista);
-
-    // cout<<largo<<endl;
-
-    // for (int i = 0; i < largo; i++)
-    // {
-    //     cout<<(char) infoLista[i]<<endl;
-    // }
     
+
+
+
 
 
 
